@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+
+
 @Repository
 public interface TrainingRecordRepository extends JpaRepository<TrainingRecord, Long> {
 
@@ -24,4 +26,5 @@ public interface TrainingRecordRepository extends JpaRepository<TrainingRecord, 
     // Custom @Query
     @Query("SELECT t FROM TrainingRecord t WHERE t.status = :status AND t.dueDate >= :date")
     List<TrainingRecord> findActiveTasks(@Param("status") String status, @Param("date") LocalDate date);
+    List<TrainingRecord> findByDueDateBefore(LocalDate date);
 }
