@@ -18,8 +18,20 @@ public class TrainingRecordController {
 
     // PUT {id} → Update
     @PutMapping("/{id}")
-    public TrainingRecord update(@PathVariable Long id, @RequestBody TrainingRecord updated) {
-        TrainingRecord record = repository.findById(id).orElseThrow();
+    public TrainingRecord update(@PathVariable Long id,
+                                 @RequestBody TrainingRecord updated,
+                                 @RequestParam(required = false) String role) {
+
+        if (role == null) {
+            throw new RuntimeException("Role is required");
+        }
+
+        if (!role.equals("ADMIN") && !role.equals("MANAGER")) {
+            throw new RuntimeException("Access Denied");
+        }
+
+        TrainingRecord record = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Record not found"));
 
         record.setTitle(updated.getTitle());
         record.setDescription(updated.getDescription());
@@ -34,11 +46,24 @@ public class TrainingRecordController {
 
     // DELETE {id} → Soft delete
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        TrainingRecord record = repository.findById(id).orElseThrow();
+    public String delete(@PathVariable Long id,
+                         @RequestParam(required = false) String role) {
+
+        if (role == null) {
+            throw new RuntimeException("Role is required");
+        }
+
+        if (!role.equals("ADMIN")) {
+            throw new RuntimeException("Only ADMIN can delete");
+        }
+
+        TrainingRecord record = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Record not found"));
+
         record.setStatus("DELETED");
         repository.save(record);
-        return "Deleted";
+
+        return "Record deleted successfully";
     }
 
     // GET /search?q=
