@@ -43,18 +43,22 @@ public class TrainingRecordController {
         return repository.findAll(pageable);
     }
 
-    // PUT {id} → Update
+    // UPDATE
     @PutMapping("/{id}")
     public TrainingRecord update(@PathVariable Long id,
                                  @RequestBody TrainingRecord updated,
-                                 @RequestParam(required = false) String role) {
+                                 @RequestParam String role) {
 
-        if (role == null) throw new RuntimeException("Role is required");
-        if (!role.equals("ADMIN") && !role.equals("MANAGER"))
-            throw new RuntimeException("Access Denied");
+        if (!role.equals("ADMIN") && !role.equals("MANAGER")) {
+            throw new IllegalArgumentException("Access Denied");
+        }
+
+        if (updated.getTitle() == null) {
+            throw new IllegalArgumentException("Title required");
+        }
 
         TrainingRecord record = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Record not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Record not found"));
 
         String oldData = record.toString();
 
@@ -82,17 +86,17 @@ public class TrainingRecordController {
         return saved;
     }
 
-    // DELETE {id}
+    // DELETE
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id,
-                         @RequestParam(required = false) String role) {
+                         @RequestParam String role) {
 
-        if (role == null) throw new RuntimeException("Role is required");
-        if (!role.equals("ADMIN"))
-            throw new RuntimeException("Only ADMIN can delete");
+        if (!role.equals("ADMIN")) {
+            throw new IllegalArgumentException("Only ADMIN can delete");
+        }
 
         TrainingRecord record = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Record not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Record not found"));
 
         String oldData = record.toString();
 
@@ -110,7 +114,7 @@ public class TrainingRecordController {
 
         auditRepository.save(log);
 
-        return "Deleted";
+        return "Record deleted successfully";
     }
 
     // SEARCH
@@ -119,10 +123,20 @@ public class TrainingRecordController {
         return repository.findByTitleContainingIgnoreCase(q);
     }
 
-    // STATS
+    // ✅ IMPROVED STATS
     @GetMapping("/stats")
-    public long stats() {
-        return repository.count();
+    public Map<String, Long> stats() {
+
+        long total = repository.count();
+        long completed = repository.findByStatus("COMPLETED").size();
+        long pending = repository.findByStatus("PENDING").size();
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("total", total);
+        response.put("completed", completed);
+        response.put("pending", pending);
+
+        return response;
     }
 
     // ✅ CSV EXPORT
@@ -134,7 +148,6 @@ public class TrainingRecordController {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintWriter writer = new PrintWriter(out);
 
-        // header
         writer.println("ID,Title,Status,Priority,DueDate");
 
         for (TrainingRecord r : records) {
