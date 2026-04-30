@@ -6,14 +6,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import com.internship.tool.entity.AuditLog;
+import com.internship.tool.repository.AuditLogRepository;
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/training")
 public class TrainingRecordController {
 
     private final TrainingRecordRepository repository;
+    private final AuditLogRepository auditRepository;
 
-    public TrainingRecordController(TrainingRecordRepository repository) {
+    public TrainingRecordController(TrainingRecordRepository repository,
+                                    AuditLogRepository auditRepository) {
         this.repository = repository;
+        this.auditRepository = auditRepository;
     }
 
     // PUT {id} → Update
@@ -33,6 +40,10 @@ public class TrainingRecordController {
         TrainingRecord record = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Record not found"));
 
+        // ✅ Capture OLD data
+        String oldData = record.toString();
+
+        // Update fields
         record.setTitle(updated.getTitle());
         record.setDescription(updated.getDescription());
         record.setStatus(updated.getStatus());
@@ -41,7 +52,24 @@ public class TrainingRecordController {
         record.setDueDate(updated.getDueDate());
         record.setScore(updated.getScore());
 
-        return repository.save(record);
+        TrainingRecord saved = repository.save(record);
+
+        // ✅ Capture NEW data
+        String newData = saved.toString();
+
+        // ✅ Audit log
+        AuditLog log = new AuditLog();
+        log.setEntityType("TrainingRecord");
+        log.setEntityId(id);
+        log.setAction("UPDATE");
+        log.setChangedBy(role);
+        log.setChangedAt(LocalDateTime.now());
+        log.setOldValue(oldData);
+        log.setNewValue(newData);
+
+        auditRepository.save(log);
+
+        return saved;
     }
 
     // DELETE {id} → Soft delete
@@ -60,8 +88,23 @@ public class TrainingRecordController {
         TrainingRecord record = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Record not found"));
 
+        // ✅ Capture OLD data
+        String oldData = record.toString();
+
         record.setStatus("DELETED");
         repository.save(record);
+
+        // ✅ Audit log
+        AuditLog log = new AuditLog();
+        log.setEntityType("TrainingRecord");
+        log.setEntityId(id);
+        log.setAction("DELETE");
+        log.setChangedBy(role);
+        log.setChangedAt(LocalDateTime.now());
+        log.setOldValue(oldData);
+        log.setNewValue("DELETED");
+
+        auditRepository.save(log);
 
         return "Record deleted successfully";
     }
