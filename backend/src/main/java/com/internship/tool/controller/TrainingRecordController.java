@@ -26,13 +26,17 @@ public class TrainingRecordController {
         this.auditRepository = auditRepository;
     }
 
-    // ✅ GET ALL WITH PAGINATION
+    // ✅ GET ALL WITH PAGINATION (SAFE)
     @GetMapping
     public Page<TrainingRecord> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
+
+        // 🔥 HOTFIX: pagination safety
+        if (page < 0) page = 0;
+        if (size <= 0) size = 5;
 
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
@@ -43,13 +47,15 @@ public class TrainingRecordController {
         return repository.findAll(pageable);
     }
 
-    // ✅ UPDATE
+    // ✅ UPDATE (SAFE)
     @PutMapping("/{id}")
     public TrainingRecord update(@PathVariable Long id,
                                  @RequestBody TrainingRecord updated,
                                  @RequestParam String role) {
 
-        if (!role.equals("ADMIN") && !role.equals("MANAGER")) {
+        // 🔥 HOTFIX: role null + validation
+        if (role == null ||
+                (!role.equals("ADMIN") && !role.equals("MANAGER"))) {
             throw new IllegalArgumentException("Access Denied");
         }
 
@@ -90,12 +96,13 @@ public class TrainingRecordController {
         return saved;
     }
 
-    // ✅ DELETE
+    // ✅ DELETE (SAFE)
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id,
                          @RequestParam String role) {
 
-        if (!role.equals("ADMIN")) {
+        // 🔥 HOTFIX: role null check
+        if (role == null || !role.equals("ADMIN")) {
             throw new IllegalArgumentException("Only ADMIN can delete");
         }
 
@@ -121,7 +128,7 @@ public class TrainingRecordController {
         return "Record deleted successfully";
     }
 
-    // ✅ SEARCH (FIXED — NO CRASH)
+    // ✅ SEARCH (SAFE)
     @GetMapping("/search")
     public List<TrainingRecord> search(@RequestParam String q) {
 
@@ -148,7 +155,7 @@ public class TrainingRecordController {
         return response;
     }
 
-    // ✅ CSV EXPORT
+    // ✅ CSV EXPORT (SAFE)
     @GetMapping("/export")
     public String exportCSV() {
 
@@ -159,13 +166,14 @@ public class TrainingRecordController {
 
         writer.println("ID,Title,Status,Priority,DueDate");
 
+        // 🔥 HOTFIX: null-safe export
         for (TrainingRecord r : records) {
             writer.println(
                     r.getId() + "," +
-                            r.getTitle() + "," +
-                            r.getStatus() + "," +
-                            r.getPriority() + "," +
-                            r.getDueDate()
+                            (r.getTitle() != null ? r.getTitle() : "") + "," +
+                            (r.getStatus() != null ? r.getStatus() : "") + "," +
+                            (r.getPriority() != null ? r.getPriority() : "") + "," +
+                            (r.getDueDate() != null ? r.getDueDate() : "")
             );
         }
 
