@@ -43,7 +43,7 @@ public class TrainingRecordController {
         return repository.findAll(pageable);
     }
 
-    // UPDATE
+    // ✅ UPDATE
     @PutMapping("/{id}")
     public TrainingRecord update(@PathVariable Long id,
                                  @RequestBody TrainingRecord updated,
@@ -51,6 +51,10 @@ public class TrainingRecordController {
 
         if (!role.equals("ADMIN") && !role.equals("MANAGER")) {
             throw new IllegalArgumentException("Access Denied");
+        }
+
+        if (updated == null) {
+            throw new IllegalArgumentException("Invalid request body");
         }
 
         if (updated.getTitle() == null) {
@@ -86,7 +90,7 @@ public class TrainingRecordController {
         return saved;
     }
 
-    // DELETE
+    // ✅ DELETE
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id,
                          @RequestParam String role) {
@@ -117,13 +121,18 @@ public class TrainingRecordController {
         return "Record deleted successfully";
     }
 
-    // SEARCH
+    // ✅ SEARCH (FIXED — NO CRASH)
     @GetMapping("/search")
     public List<TrainingRecord> search(@RequestParam String q) {
+
+        if (q == null || q.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
         return repository.findByTitleContainingIgnoreCase(q);
     }
 
-    // ✅ IMPROVED STATS
+    // ✅ STATS
     @GetMapping("/stats")
     public Map<String, Long> stats() {
 
