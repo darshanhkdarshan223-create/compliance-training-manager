@@ -19,7 +19,7 @@ AI-powered web application for managing compliance training with automated insig
 ## ⚙️ Setup Instructions
 
 ### 1. Clone Repository
-git clone <your-repo-url>
+git clone <https://github.com/darshanhkdarshan223-create/compliance-training-manager.git>
 cd your-project-folder
 
 ### 2. Setup Environment
