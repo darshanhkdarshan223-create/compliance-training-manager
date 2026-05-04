@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🚀 Compliance Training Manager
 
 AI-powered web application for managing compliance training with automated insights and recommendations.
@@ -99,3 +100,6 @@ docker-compose down -v
 3. AI generates description
 4. View recommendations
 5. Dashboard analytics
+=======
+# Compliance Training Manager
+>>>>>>> 34cc8fbaa8efd189fb43e1861c8cdde528f1793d
