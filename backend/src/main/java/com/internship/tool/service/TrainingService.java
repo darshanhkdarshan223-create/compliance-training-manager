@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +17,11 @@ public class TrainingService {
 
     private final TrainingRepository repository;
 
+    // CREATE
     public TrainingResponse create(TrainingRequest request) {
+
+        Objects.requireNonNull(request, "Request cannot be null");
+
         Training training = Training.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -28,6 +33,7 @@ public class TrainingService {
         return mapToResponse(saved);
     }
 
+    // GET ALL
     public List<TrainingResponse> getAll() {
         return repository.findAll()
                 .stream()
@@ -35,14 +41,23 @@ public class TrainingService {
                 .toList();
     }
 
+    // GET BY ID
     public TrainingResponse getById(Long id) {
+
+        Objects.requireNonNull(id, "ID cannot be null");
+
         Training training = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Training not found"));
 
         return mapToResponse(training);
     }
 
+    // UPDATE
     public TrainingResponse update(Long id, TrainingRequest request) {
+
+        Objects.requireNonNull(id, "ID cannot be null");
+        Objects.requireNonNull(request, "Request cannot be null");
+
         Training training = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Training not found"));
 
@@ -54,14 +69,23 @@ public class TrainingService {
         return mapToResponse(repository.save(training));
     }
 
+    // DELETE
     public void delete(Long id) {
+
+        Objects.requireNonNull(id, "ID cannot be null");
+
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Training not found");
         }
+
         repository.deleteById(id);
     }
 
+    // MAPPER
     private TrainingResponse mapToResponse(Training t) {
+
+        Objects.requireNonNull(t, "Training cannot be null");
+
         return TrainingResponse.builder()
                 .id(t.getId())
                 .title(t.getTitle())
