@@ -30,6 +30,7 @@ public class TrainingService {
                 .build();
 
         Training saved = repository.save(training);
+
         return mapToResponse(saved);
     }
 
