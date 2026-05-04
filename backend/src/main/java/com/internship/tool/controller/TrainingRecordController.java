@@ -33,13 +33,13 @@ public class TrainingRecordController {
         TrainingRecord record = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Record not found"));
 
-        record.setTitle(updated.getTitle());
-        record.setDescription(updated.getDescription());
-        record.setStatus(updated.getStatus());
-        record.setPriority(updated.getPriority());
-        record.setAssignedTo(updated.getAssignedTo());
-        record.setDueDate(updated.getDueDate());
-        record.setScore(updated.getScore());
+        if (updated.getTitle() != null) record.setTitle(updated.getTitle());
+        if (updated.getDescription() != null) record.setDescription(updated.getDescription());
+        if (updated.getStatus() != null) record.setStatus(updated.getStatus());
+        if (updated.getPriority() != null) record.setPriority(updated.getPriority());
+        if (updated.getAssignedTo() != null) record.setAssignedTo(updated.getAssignedTo());
+        if (updated.getDueDate() != null) record.setDueDate(updated.getDueDate());
+        if (updated.getScore() != null) record.setScore(updated.getScore());
 
         return repository.save(record);
     }
