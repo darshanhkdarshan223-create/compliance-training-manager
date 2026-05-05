@@ -1,5 +1,6 @@
 package com.internship.tool.service;
 
+import com.internship.tool.dto.DashboardResponse;
 import com.internship.tool.dto.TrainingRequest;
 import com.internship.tool.dto.TrainingResponse;
 import com.internship.tool.entity.Training;
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ public class TrainingService {
     private final TrainingRepository repository;
 
     // CREATE
+    @CacheEvict(value = { "trainingsAll", "training" }, allEntries = true)
     public TrainingResponse create(TrainingRequest request) {
 
         Objects.requireNonNull(request, "Request cannot be null");
@@ -35,6 +40,7 @@ public class TrainingService {
     }
 
     // GET ALL
+    @Cacheable(value = "trainingsAll")
     public List<TrainingResponse> getAll() {
         return repository.findAll()
                 .stream()
@@ -42,7 +48,21 @@ public class TrainingService {
                 .toList();
     }
 
+    // DASHBOARD METRICS
+    public DashboardResponse getDashboardMetrics() {
+        long total = repository.count();
+        long pending = repository.countByStatus("PENDING");
+        long completed = repository.countByStatus("COMPLETED");
+
+        return DashboardResponse.builder()
+                .totalTrainings(total)
+                .pendingTrainings(pending)
+                .completedTrainings(completed)
+                .build();
+    }
+
     // GET BY ID
+    @Cacheable(value = "training", key = "#id")
     public TrainingResponse getById(Long id) {
 
         Objects.requireNonNull(id, "ID cannot be null");
@@ -54,6 +74,7 @@ public class TrainingService {
     }
 
     // UPDATE
+    @CacheEvict(value = { "trainingsAll", "training" }, allEntries = true)
     public TrainingResponse update(Long id, TrainingRequest request) {
 
         Objects.requireNonNull(id, "ID cannot be null");
@@ -71,6 +92,7 @@ public class TrainingService {
     }
 
     // DELETE
+    @CacheEvict(value = { "trainingsAll", "training" }, allEntries = true)
     public void delete(Long id) {
 
         Objects.requireNonNull(id, "ID cannot be null");

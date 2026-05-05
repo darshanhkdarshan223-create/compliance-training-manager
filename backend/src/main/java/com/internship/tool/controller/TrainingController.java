@@ -1,5 +1,6 @@
 package com.internship.tool.controller;
 
+import com.internship.tool.dto.DashboardResponse;
 import com.internship.tool.dto.TrainingRequest;
 import com.internship.tool.dto.TrainingResponse;
 import com.internship.tool.service.TrainingService;
@@ -15,6 +16,11 @@ import java.util.List;
 public class TrainingController {
 
     private final TrainingService service;
+
+    @GetMapping("/dashboard")
+    public DashboardResponse getDashboard() {
+        return service.getDashboardMetrics();
+    }
 
     @PostMapping
     public TrainingResponse create(@Valid @RequestBody TrainingRequest request) {
