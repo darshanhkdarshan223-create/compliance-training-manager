@@ -93,10 +93,34 @@ docker-compose down -v
 
 ---
 
-## 🎯 Demo Flow
+## 🎯 Demo Script (Demo Day)
 
-1. Login
-2. Create training record
-3. AI generates description
-4. View recommendations
-5. Dashboard analytics
+**Role**: Presenter / Team Lead
+
+**Step 1: Introduction & Login**
+- "Welcome to the Compliance Training Manager. Today I'll show you how we've streamlined training tracking and leveraging AI to simplify compliance."
+- Navigate to `http://localhost:3000/login`
+- Click **Sign In** (demonstrates sleek, glassmorphic login interface).
+
+**Step 2: The Dashboard Overview**
+- "Upon logging in, managers land on the Analytics Dashboard. Here we see real-time aggregated metrics pulled directly from our Redis-cached Spring Boot backend."
+- Point out the Total, Pending, and Completed counters.
+
+**Step 3: Creating a Training**
+- "Let's create a new training module."
+- Click **+ New** in the Navbar.
+- Fill out the form (e.g., "GDPR 2026 Refresh", "Annual European Data Privacy Update") and click **Create Training**.
+
+**Step 4: AI Insights**
+- "Now, the real power of our tool: AI generation."
+- Navigate to the newly created training's Detail page.
+- Click **Generate with AI**.
+- "Our React frontend proxies this request securely through the Spring Boot API, which communicates with our Python Flask Microservice. The LLaMA model processes the context and returns an executive description and tailored recommendations instantly."
+
+**Step 5: General AI Assistant**
+- Go back to the **Dashboard**.
+- Enter a scenario in the AI Assistant box (e.g., "We are expanding to California and need CCPA training strategies").
+- Click **Generate AI Insights** to show the generative capabilities for unstructured queries.
+
+---
+**Thank you for watching!**
