@@ -11,6 +11,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+
+import com.internship.tool.security.JwtUtil;
+import com.internship.tool.security.CustomUserDetailsService;
 
 import java.util.*;
 
@@ -26,11 +30,17 @@ public class TrainingRecordControllerTest {
         @Autowired
         private MockMvc mockMvc;
 
-        @Autowired
-        private ObjectMapper objectMapper;
-
         @MockBean
         private TrainingRecordService service;
+
+        @MockBean
+        private JwtUtil jwtUtil;
+
+        @MockBean
+        private CustomUserDetailsService customUserDetailsService;
+
+        @MockBean
+        private JpaMetamodelMappingContext jpaMappingContext;
 
         // ✅ TEST GET ALL (paginated)
         @Test
