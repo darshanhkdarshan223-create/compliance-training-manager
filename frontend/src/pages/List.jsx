@@ -15,7 +15,7 @@ export default function List() {
         <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
           Compliance Trainings
         </h2>
-        <Link to="/form" className="btn-primary">
+        <Link to="/create" className="btn-primary">
           + New Training
         </Link>
       </div>

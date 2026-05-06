@@ -101,4 +101,17 @@ public class TrainingRecord {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "TrainingRecord{" +
+                "id=" + id +
+                ", title='" + (title != null ? title : "") + '\'' +
+                ", status='" + (status != null ? status : "") + '\'' +
+                ", priority='" + (priority != null ? priority : "") + '\'' +
+                ", assignedTo='" + (assignedTo != null ? assignedTo : "") + '\'' +
+                ", dueDate=" + dueDate +
+                ", score=" + score +
+                '}';
+    }
 }

@@ -1,6 +1,5 @@
 package com.internship.tool.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/api/ai")
-@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class AIController {
 
     private final RestTemplate restTemplate = new RestTemplate();
