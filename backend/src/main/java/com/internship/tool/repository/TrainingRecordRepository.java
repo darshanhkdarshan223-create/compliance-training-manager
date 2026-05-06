@@ -26,6 +26,7 @@ public interface TrainingRecordRepository extends JpaRepository<TrainingRecord, 
     // Search with pagination (NEW)
     Page<TrainingRecord> findByTitleContainingIgnoreCase(String keyword, Pageable pageable);
 
+
     // Custom query
     @Query("SELECT t FROM TrainingRecord t WHERE t.status = :status AND t.dueDate >= :date")
     List<TrainingRecord> findActiveTasks(@Param("status") String status, @Param("date") LocalDate date);

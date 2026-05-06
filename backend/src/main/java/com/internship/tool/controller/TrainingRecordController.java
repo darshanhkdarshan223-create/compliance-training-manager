@@ -1,4 +1,5 @@
 package com.internship.tool.controller;
+import org.springframework.http.ResponseEntity;
 
 import com.internship.tool.entity.TrainingRecord;
 import com.internship.tool.entity.AuditLog;
@@ -130,13 +131,19 @@ public class TrainingRecordController {
 
     // ✅ SEARCH (SAFE)
     @GetMapping("/search")
-    public List<TrainingRecord> search(@RequestParam String q) {
+    public List<TrainingRecord> search(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status) {
 
-        if (q == null || q.trim().isEmpty()) {
-            return new ArrayList<>();
+        if (q != null && !q.isEmpty()) {
+            return repository.findByTitleContainingIgnoreCase(q);
         }
 
-        return repository.findByTitleContainingIgnoreCase(q);
+        if (status != null && !status.isEmpty()) {
+            return repository.findByStatus(status);
+        }
+
+        return repository.findAll();
     }
 
     // ✅ STATS
@@ -154,19 +161,30 @@ public class TrainingRecordController {
 
         return response;
     }
-
+    @PostMapping
+    public TrainingRecord createTraining(@RequestBody TrainingRecord record) {
+        return repository.save(record);
+    }
+    @GetMapping("/audit")
+    public List<AuditLog> getAuditLogs() {
+        return auditRepository.findAll();
+    }
+    private void sendEmail(String message) {
+        System.out.println("📧 EMAIL: " + message);
+    }
     // ✅ CSV EXPORT (SAFE)
-    @GetMapping("/export")
-    public String exportCSV() {
+    @GetMapping(value = "/export", produces = "text/plain")
+    public ResponseEntity<byte[]> exportCSV() {
 
         List<TrainingRecord> records = repository.findAll();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintWriter writer = new PrintWriter(out);
 
+        // Header
         writer.println("ID,Title,Status,Priority,DueDate");
 
-        // 🔥 HOTFIX: null-safe export
+        // Data
         for (TrainingRecord r : records) {
             writer.println(
                     r.getId() + "," +
@@ -178,6 +196,26 @@ public class TrainingRecordController {
         }
 
         writer.flush();
-        return out.toString();
+
+        byte[] csvBytes = out.toByteArray();
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=training_report.csv")
+                .header("Content-Type", "text/csv")
+                .body(csvBytes);
     }
+    @PutMapping("/{id}/status")
+    public TrainingRecord updateStatus(@PathVariable Long id, @RequestParam String status) {
+
+        TrainingRecord record = repository.findById(id).orElseThrow();
+
+        record.setStatus(status);
+        TrainingRecord saved = repository.save(record);
+
+        // 🔥 EMAIL SIMULATION (ADD THIS)
+        System.out.println("📧 EMAIL: Training ID " + id + " status updated to " + status);
+
+        return saved;
+    }
+
 }
