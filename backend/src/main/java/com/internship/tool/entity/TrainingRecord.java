@@ -1,47 +1,82 @@
 package com.internship.tool.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "training_record")
+@Table(name = "training_records")
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TrainingRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
-    private String status;
+
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "status")
+    private String status = "PENDING";
+
+    @Column(name = "compliance_score", precision = 5, scale = 2)
+    private BigDecimal complianceScore;
+
+    @Column(name = "priority")
     private String priority;
-    private String assignedTo;
-    private LocalDate dueDate;
+
+    @Column(name = "score")
     private Integer score;
 
-    // ✅ GETTERS + SETTERS
+    @Column(name = "assigned_to")
+    private String assignedTo;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @Column(name = "due_date")
+    private LocalDate dueDate;
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    @Column(name = "completed_date")
+    private LocalDate completedDate;
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    @Column(name = "ai_description", columnDefinition = "TEXT")
+    private String aiDescription;
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    @Column(name = "ai_recommendations", columnDefinition = "TEXT")
+    private String aiRecommendations;
 
-    public String getPriority() { return priority; }
-    public void setPriority(String priority) { this.priority = priority; }
+    @Column(name = "file_path")
+    private String filePath;
 
-    public String getAssignedTo() { return assignedTo; }
-    public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
+    @Column(name = "file_name")
+    private String fileName;
 
-    public LocalDate getDueDate() { return dueDate; }
-    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    public Integer getScore() { return score; }
-    public void setScore(Integer score) { this.score = score; }
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
 }
